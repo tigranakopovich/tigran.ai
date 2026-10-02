@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {vertexShader,fragmentShader} from './shaders.js';
 const STATES=[
- {x:1.55,scale:1,rotation:.036,wave:.55,opacity:1,zones:0},
+ {x:1.13,scale:1,rotation:.036,wave:.55,opacity:1,zones:0},
  {x:1.76,scale:.96,rotation:.043,wave:.9,opacity:.8,zones:0},
  {x:1.52,scale:1.05,rotation:.028,wave:.35,opacity:1.25,zones:0},
  {x:1.64,scale:.98,rotation:.02,wave:.28,opacity:.85,zones:1},
@@ -30,7 +30,7 @@ export function createNeuralField(canvas,reduced){
  }catch{renderer?.dispose();return{diagnostics,setState(){},render(){},resize(){},suspend(){},dispose(){}};}
  const move=e=>{if(coarse.matches||reduced.matches)return;pointerTarget.x=e.clientX/width*2-1;pointerTarget.y=1-e.clientY/height*2;pointerTarget.active=1;};
  const leave=()=>{pointerTarget.active=0;};window.addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerleave',leave);
- function resize(){if(disposed)return;width=innerWidth;height=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(width,height,false);diagnostics.dpr=renderer.getPixelRatio();uniforms.uDpr.value=diagnostics.dpr;camera.aspect=width/height;camera.updateProjectionMatrix();render(0,true);}
+ function resize(){if(disposed)return;width=innerWidth;height=innerHeight;renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<=600?1:1.5));renderer.setSize(width,height,false);diagnostics.dpr=renderer.getPixelRatio();uniforms.uDpr.value=diagnostics.dpr;camera.aspect=width/height;camera.updateProjectionMatrix();render(0,true);}
  function render(delta,force=false){
   if(disposed||suspended||(!force&&(document.hidden||reduced.matches)))return;
   const dt=Math.min(Math.max(delta,0),.05),damp=1-Math.exp(-dt*3.5);
