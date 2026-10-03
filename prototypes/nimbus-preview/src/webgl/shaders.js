@@ -24,10 +24,10 @@ void main(){
  p=vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);
  c=cos(uTilt.y);s=sin(uTilt.y);p=vec3(p.x,c*p.y-s*p.z,s*p.y+c*p.z);
  vec3 normal=normalize(p);
- float rim=pow(1.0-abs(normal.z),1.4);
+ float rim=pow(1.0-abs(normal.z),2.0);
  float directional=max(0.0,dot(normal,normalize(vec3(-.7,.9,1.0))));
  float bands=.5+.5*cos(length(position)*10.5);
- vLight=.24+rim*.95+directional*.32+bands*uZones*.11;
+ vLight=.055+rim*(1.18+directional*.62)+bands*uZones*.06;
  vDepth=clamp((p.z+2.1)/4.2,.0,1.0);
  p*=uScale;p.x+=uOffsetX;p.y+=.02;
  vec4 mv=modelViewMatrix*vec4(p,1.0);
@@ -38,7 +38,7 @@ void main(){
  p.xy+=normalize(diff+vec2(.001))*influence*.11;
  mv=modelViewMatrix*vec4(p,1.0);
  gl_Position=projectionMatrix*mv;
- gl_PointSize=clamp(aSize*uDpr*(.74+vDepth*.53)*(5.6/-mv.z),.65,4.3);
+ gl_PointSize=clamp(aSize*uDpr*(.52+vDepth*.98)*(5.6/-mv.z),.65,4.3);
  vTone=aTone;
 }
 `;
@@ -53,8 +53,8 @@ void main(){
  float core=1.0-smoothstep(.05,.5,r);
  vec3 silver=mix(vec3(.294,.333,.388),vec3(.957,.965,.973),vTone);
  if(vTone>.84)silver=mix(silver,vec3(.659,.737,.788),.24);
- float pulse=pow(max(0.0,sin(uTime*.27)),28.0)*.08;
- float alpha=core*(.35+vDepth*.35)*vLight*uExposure*1.6+pulse*core;
+ float alpha=core*(.12+vDepth*.88)*vLight*uExposure*1.6;
+ alpha=min(alpha,.88);
  gl_FragColor=vec4(silver,alpha);
 }
 `;

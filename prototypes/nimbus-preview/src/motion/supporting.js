@@ -1,0 +1,19 @@
+import {gsap} from 'gsap';
+export function createSupportingMotion(reduced){
+ const host=document.querySelector('.case-scene'),svg=host.querySelector('.case-branches'),paths=[...svg.querySelectorAll('path')],layer=host.querySelector('.flight-layer');
+ let caseTimeline=null,caseRun=0,caseSeen=false,suspended=false,disposed=false;
+ const visible={case:false};
+ function cancelCase(){caseRun++;caseTimeline?.kill();caseTimeline=null;layer.replaceChildren();gsap.set(host.querySelectorAll('.sample-card'),{clearProps:'borderColor,opacity'});}
+ function draw(){
+  const base=host.getBoundingClientRect(),source=host.querySelector('.case-source').getBoundingClientRect();svg.setAttribute('viewBox',`0 0 ${base.width} ${base.height}`);
+  host.querySelectorAll('.case-outputs>.sample-card').forEach((el,i)=>{const r=el.getBoundingClientRect();let d;if(r.left>=source.right){const x0=source.right-base.left,y0=source.top+source.height/2-base.top,x1=r.left-base.left,y1=r.top+r.height/2-base.top,m=(x0+x1)/2;d=`M${x0} ${y0} C${m} ${y0} ${m} ${y1} ${x1} ${y1}`;}else{const x0=6,y0=source.bottom-base.top,x1=r.left-base.left,y1=r.top+r.height/2-base.top;d=`M${x0} ${y0} V${y1-12} Q${x0} ${y1} ${x0+8} ${y1} H${x1}`;}paths[i].setAttribute('d',d);});
+ }
+ function runCase(){cancelCase();if(reduced.matches||!visible.case||document.hidden||suspended)return;const run=caseRun;caseTimeline=gsap.timeline({delay:.7,onComplete:()=>{if(run===caseRun)cancelCase();}});const source=host.querySelector('.case-source');caseTimeline.to(source,{borderColor:'#84d5a5',duration:.25},0).to(source,{borderColor:'#a4b9ac70',duration:.3},.4);
+  paths.forEach((path,i)=>{const point=document.createElement('i');point.className='data-flight';point.style.opacity='0';layer.append(point);const distance=path.getTotalLength(),p={t:0};const x=gsap.quickSetter(point,'x','px'),y=gsap.quickSetter(point,'y','px');const start=path.getPointAtLength(0);x(start.x-4);y(start.y-4);caseTimeline.to(point,{opacity:1,duration:.1},.4).to(p,{t:1,duration:.95,ease:'power2.inOut',onUpdate:()=>{if(run!==caseRun)return;const pt=path.getPointAtLength(distance*p.t);x(pt.x-4);y(pt.y-4);}},.4).to(point,{opacity:0,duration:.15},1.35).to(host.querySelectorAll('.case-outputs>.sample-card')[i],{borderColor:'#84d5a5',duration:.25},1.35).to(host.querySelectorAll('.case-outputs>.sample-card')[i],{borderColor:'#a4b9ac70',duration:.3},1.7);});
+ }
+ const observer=new IntersectionObserver(entries=>{visible.case=entries[0].isIntersecting;if(!visible.case){cancelCase();return;}if(!caseSeen){caseSeen=true;runCase();}},{threshold:.15});observer.observe(host);
+ const resize=()=>{cancelCase();draw();};window.addEventListener('resize',resize);document.fonts.ready.then(()=>{if(!disposed)draw();});draw();
+ const input=document.querySelector('#business'),cancelAll=()=>cancelCase();input.addEventListener('focus',cancelAll);reduced.addEventListener('change',cancelAll);const hidden=()=>{if(document.hidden)cancelAll();};document.addEventListener('visibilitychange',hidden);
+ const details=document.querySelector('.case-details'),summary=details.querySelector('summary');const toggle=()=>{summary.setAttribute('aria-expanded',String(details.open));draw();};const escape=e=>{if(e.key==='Escape'&&details.open){details.open=false;summary.focus();}};details.addEventListener('toggle',toggle);details.addEventListener('keydown',escape);
+ return{draw,cancelAll,get active(){return caseTimeline?['case']:[];},suspend(value){suspended=value;cancelAll();},destroy(){disposed=true;cancelAll();observer.disconnect();window.removeEventListener('resize',resize);input.removeEventListener('focus',cancelAll);reduced.removeEventListener('change',cancelAll);document.removeEventListener('visibilitychange',hidden);details.removeEventListener('toggle',toggle);details.removeEventListener('keydown',escape);}};
+}

@@ -1,0 +1,44 @@
+{
+  "model": "HP EliteBook 840 G7",
+  "articleNumber": "1",
+  "processor": "Intel Core i5-10210U",
+  "ram": "16 GB",
+  "storage": "512 GB SSD",
+  "display": "14 Zoll",
+  "telegram": {
+    "label": "Характеристики и фотографии",
+    "representation": "HTML реконструкция входа; не оригинальный screenshot одного заказа",
+    "lines": [
+      "HP EliteBook 840 G7",
+      "Intel Core i5-10210U",
+      "16 GB RAM · 512 GB SSD",
+      "14-Zoll-Display"
+    ]
+  },
+  "materials": {
+    "listingFile": "case-listing-de.txt",
+    "displayFileName": "Advertisement.txt",
+    "photoFiles": [],
+    "photoStatus": "OPEN_ORIGINAL_FILES_NOT_AVAILABLE",
+    "folderRepresentation": "Фотографии и Advertisement.txt; не выдавать вымышленное имя папки за исходное."
+  },
+  "sheet": {
+    "columns": [
+      "Артикул",
+      "Модель",
+      "Процессор",
+      "RAM",
+      "SSD"
+    ],
+    "row": [
+      "1",
+      "HP EliteBook 840 G7",
+      "Intel Core i5-10210U",
+      "16 GB",
+      "512 GB"
+    ],
+    "representation": "HTML строка по данным исходной таблицы, не исходный screenshot"
+  },
+  "publicCaption": "Схема работы помощника. Пример данных.",
+  "detailCaption": "Представление по материалам проекта. Немецкий текст подготовлен для лендинга."
+}
