@@ -1,16 +1,16 @@
 # Tigran AI — Supporting Visual Specification
 
-Обновлено: 03.10.2026. APPROVED DIRECTION — общий тёмный редизайн на текущей Nimbus-базе; значения являются стартовыми настройками. Exact copy и режимы смены APPROVED 03.10.2026; недостающие фото и Telegram composer остаются OPEN. Этот документ не разрешает самостоятельно начать implementation/deployment.
+Обновлено: 04.10.2026. APPROVED DIRECTION — общий тёмный редизайн на текущей Nimbus-базе; значения являются стартовыми настройками. Exact copy и режимы смены APPROVED 03.10.2026; недостающие фото и Telegram composer остаются OPEN. Этот документ не разрешает самостоятельно начать implementation/deployment.
 
 ## 0. Приоритет, references и сохранение основы
 
 SPEC.md — source of truth. При конфликте приоритет SPEC. Builder использует этот документ только когда MAIN включает его в отдельный brief. Одно назначение: references/BUILDER-REDESIGN-BRIEF.md, после снятия его gates. Old v2/Attio, initial Nimbus prompt и исторические section notes не являются альтернативными заданиями. Архив предыдущей SPEC/VISUAL версии: references/archive/2026-10-03-before-sync/.
 
 Активные картинки:
-- Hero: hero-dark-motion-v1.png.
-- Задачи: tasks-unified-v1.png.
-- Кейс: case-dark-v1.png.
-- Финал A: final-unified-a.png, та же версия final-unified-a-v2.png.
+- Hero: hero-glass-earth-v2.png.
+- Задачи: tasks-glass-v1.png.
+- Кейс: case-glass-v1.png.
+- Финал A: final-glass-v2.png с новым портретом Avatar-graphite-shirt-v1.png; отдельный photo asset подготовлен для просмотра владельцем.
 
 Смысловые пять блоков представлены четырьмя визуальными областями: Hero → задачи → кейс → этапы и контакт. Подписи/image-generated фото не брать как final assets/copy. База исходников prototypes/nimbus-preview/, текущий static root является результатом сборки/экспорта, не создавать в нём вторую независимую реализацию.
 
@@ -18,11 +18,11 @@ SPEC.md — source of truth. При конфликте приоритет SPEC. 
 
 ## 1. Единая система
 
-Фон #2D322F; surfaces #38443F; ink #E5EEE8; readable secondary #BFCBC3; placeholder #B5C3BA; mint #84D5A5; dark CTA text #0B2116; process accent #9EB7CE только где помогает смыслу. Контраст проверяется по computed surfaces, не объявлять достаточным из-за hex на бумаге. Обычный текст ≥4.5:1; focus и UI границы различимы. Не наследовать --line:transparent для panels, где нужны контуры.
+APPROVED палитра: фон #13171D; дымчатые surfaces #202630; ink #F2F4F7; secondary/placeholder #B8C1CC; mint #92DABB; CTA text #10231D. Мята только для действий/выбора/статуса, не зелёная заливка сайта. Glass на нейтральной поверхности; контраст проверять на смешанном фоне, обычный текст ≥4.5:1. Подробные токены и ограничения GLASS-GRAPHITE-IMPLEMENTATION.md.
 
 Manrope local Cyrillic/Latin 400–800, font-display:swap, font-synthesis:none. Display800, body400–500. Mono existing Consolas/system только для меток/данных по необходимости, не для всего copy. Не устанавливать новые fonts/packages.
 
-Content max около1400px, широкие gutters48–72px, tablet24–32px, mobile20–22px (320px:16–18). H1 ориентир76–96px на wide desktop, адаптивное снижение; H2 section40–52px, body16–18px. Без принудительной высоты viewport для всех секций; только Hero на высоком desktop получает отдельный полный первый экран по новому назначению. Panel radius20–28px, buttons12–14px, field12–14px. Поверхности мягкие, без яркого стекла/3D cubes/macOS chrome. Существующие point pattern не размножать.
+Content max около1400px, широкие gutters48–72px, tablet24–32px, mobile20–22px (320px:16–18). H1 ориентир76–96px на wide desktop, адаптивное снижение; H2 section40–52px, body16–18px. Без принудительной высоты viewport для всех секций; только Hero на высоком desktop получает отдельный полный первый экран по новому назначению. Panel radius20–28px, buttons12–14px, field12–14px. Поверхности — дымчатое стекло с деликатным светлым краем и тенью; без сильного неона, 3D cubes/macOS chrome или animated blur. Существующие point pattern не размножать.
 
 Hover button y−2…−3px/160–220ms, no size shifts, pressed return. Focus отчётливый; hit target≥44px. На touch hover effects не зависают. Декоративные иконки/панели не fake buttons. Поле16px minimum, сохраняет clear focus.
 
@@ -36,7 +36,7 @@ APPROVED Hero cycle ≈6s: ввод исходного сообщения 1,5–
 
 State: selected, phase, userPaused, interactionHeld, visible, hidden, reduced, completedCycles. User pause сохраняется. Hover/focus hold допускает завершить текущий короткий проход, но запрещает advance. Manual tab отменяет old timeline и оставляет выбор до явного continue. Неисполненные callbacks отменяются runId; no catch-up после hidden/offscreen. Accessible selector native buttons aria-pressed либо корректные tabs; не смешивать паттерны.
 
-Сфера: существующий seeded Three.Points/shader позади правых панелей. Видимый объём Nimbus: серебристая подсветка края, прозрачный центр, глубина, мягкий боковой свет. Центр около середины двух панелей, диаметр ориентир 1.1–1.25 их ширины. Разрешена совместная настройка CSS opacity/uExposure/rim; прежний запрет изменять яркость отменён. Без увеличения particle count, новых эффектов или линий между точками. Fine pointer только справа, touch/reduced без реакции, вне Hero рендер остановлен.
+Земля: existing seeded Three.Points/shader только в Hero, узнаваемые континенты, серебристый край, тёмные океаны. Проекция строго круглая, X/Y диаметр равен; camera aspect соответствует canvas, nonuniform CSS scale запрещён. Центр за двумя стеклянными panels, силуэт виден сверху и по бокам. Подготовка маски один раз, движение uniforms, без увеличения particle count. Fine pointer справа; touch/reduced без реакции; offscreen/hidden stopped.
 
 H1 scroll divergence desktop: строка1 до20–28px left, строка2 до20–28px right, строка3 до10–16px down; один обратимый scrub mapping без pin/rotation/scale. Description/CTA не двигаются. Mobile/reduced off; narrow desktop smaller amplitude toavoid clipping.
 
@@ -66,7 +66,7 @@ One continuouspanel: compact3horizontalstages→outcome+conditions→divider→p
 
 Fullstage descriptionsSPEC. Удалить все мини-схемы под тремя этапами: исходники/карта процесса, данные/результат, проверки/исправления. Сохранить основные описания, результат разбора, условия и контакт.
 
-Contact stronger visualweight: divider gap40–48desktop/24–32mobile, H2≈38–44desktop/28–32mobile, inputmin56desktop/52mobile. Не cramped narrowfield nexttooversizedbutton: broadfield,buttonbelow. Readablecaption/placeholder. Photo crop≈160×180desktop/88×88mobile, исходное лицо; отдельная Avatar-soft-background-v1.png дляreview, не вырезать изreference. Фото требуетпринятиявладельцем, не применять saturationwholeimage.
+Contact в той же дымчатой стеклянной системе; fieldmin56desktop/52mobile, font16. Compact layout, читаемые подписи. Новый исходник получен: Avatar-original-2026-10-04.png. Подготовленная производная: Avatar-graphite-shirt-v1.png; фон graphite, тёмная рубашка, узнаваемость лица сохраняется. Использовать отдельную производную после просмотра владельцем, не вырезать лицо из final-glass-v2.png. Supporting instructions: AVATAR-GRAPHITE-HANDOFF.md.
 
 Primary Conversion дословноSPEC. Candidatecaption наA-v2 DRAFT доcomposerverification; actualcaption остаётся «Подготовим первое сообщение. Отправите его сами в Telegram.» Визуальныйref не отменяетgate. Form/photo/CTA неподвижны и interactivesразу.
 
@@ -125,3 +125,11 @@ Hero: desktop min-block-size около100svh, border-box; arrow28–40px от �
 Финал: цель760–820px на wide desktop с сохранением copy; panel padding24–32, divider/contact24–28, портрет128–144px, H2 этапов34–38px одной строкой только если помещается. На mobile не пытаться уместить все этапы и форму в одну высоту экрана. Сохранить field56/52px и font16.
 
 Новые проверки ограничены1440×900 и390×844, с дополнительной короткой высотой лишь при дефекте. Не применять раздел8 как требование заново повторить полную матрицу. Заметность сферы оценивать в обычном motion, не только reduced screenshots.
+
+## 11. Активный стеклянный пакет
+
+APPROVED 04.10.2026 — GLASS-GRAPHITE-IMPLEMENTATION.md является supporting specification к SPEC. Его новые материалы/палитра/круглая Земля заменяют прежние зелёные параметры и абстрактную сферу. Основные compositions и утверждённые взаимодействия сохранены. Исторические BUILDER-REDESIGN-BRIEF / BUILDER-NIMBUS-FINAL-POLISH не возвращают старые цвета и reference. Отдельное implementation назначение после подготовки портрета.
+
+## Окончательное назначение
+
+MAIN подготовил BUILDER-GLASS-REDESIGN-BRIEF.md (04.10.2026) для передачи владельцем Builder. Только этот brief назначает текущую смену оформления; прежние brief исторические в пересекающемся scope. Готовый портрет Avatar-graphite-shirt-v1.png включён для локального применения. Поддерживающие инструкции этого документа действуют в пределах нового brief. Ограниченные проверки из нового brief заменяют требование повторять полную матрицу; код/публикация MAIN в этом проходе не выполняются.

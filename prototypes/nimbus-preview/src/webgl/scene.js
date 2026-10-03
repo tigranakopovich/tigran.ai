@@ -1,5 +1,17 @@
 import * as THREE from 'three';
 import {vertexShader,fragmentShader} from './shaders.js';
+import landMask from './land-mask.json';
+function maskPixel(u,v){
+ const intervals=landMask.rows[Math.min(landMask.height-1,Math.max(0,v))];u=(u+landMask.width)%landMask.width;
+ for(let k=0;k<intervals.length;k+=2){if(u<intervals[k])break;if(u<intervals[k+1])return 1;}return 0;
+}
+function onLand(x,y,z){
+ const longitude=Math.PI/2-Math.atan2(z,x),latitude=Math.asin(y/Math.hypot(x,y,z));
+ const u=Math.floor(((longitude+Math.PI)/(2*Math.PI)%1+1)%1*landMask.width);
+ const v=Math.min(landMask.height-1,Math.max(0,Math.floor((Math.PI/2-latitude)/Math.PI*landMask.height)));
+ if(!maskPixel(u,v))return 0;
+ return maskPixel(u-3,v)&&maskPixel(u+3,v)&&maskPixel(u,v-3)&&maskPixel(u,v+3)?1:1.65;
+}
 const STATES=[
  {x:1.13,scale:1,rotation:.036,wave:.55,opacity:1,zones:0},
  {x:1.76,scale:.96,rotation:.043,wave:.9,opacity:.8,zones:0},
@@ -11,7 +23,7 @@ function seeded(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(
 export function createNeuralField(canvas,reduced){
  const mobile=matchMedia('(max-width:600px)').matches,count=mobile?7000:19000;
  const diagnostics={available:false,count,dpr:0,frames:0,disposed:false};
- const target={...STATES[0]},current={...target};let width=canvas.clientWidth,height=canvas.clientHeight,angle=.12,time=0,suspended=false,disposed=false;
+ const target={...STATES[0]},current={...target};let width=canvas.clientWidth,height=canvas.clientHeight,angle=-25*Math.PI/180,time=0,suspended=false,disposed=false;
  let renderer,geometry,material,scene,camera,uniforms;
  const pointerTarget={x:0,y:0,active:0},pointer={x:0,y:0,active:0};
  const coarse=matchMedia('(pointer:coarse), (hover:none)');
@@ -20,9 +32,11 @@ export function createNeuralField(canvas,reduced){
  try{
  renderer=new THREE.WebGLRenderer({canvas,context,alpha:true,antialias:false,powerPreference:'low-power'});renderer.setClearColor(0x080e0b,0);
  camera=new THREE.PerspectiveCamera(44,width/height,.1,20);camera.position.z=6.4;
- scene=new THREE.Scene();geometry=new THREE.BufferGeometry();const random=seeded(1042026),positions=new Float32Array(count*3),seeds=new Float32Array(count),sizes=new Float32Array(count),tones=new Float32Array(count);
+ scene=new THREE.Scene();geometry=new THREE.BufferGeometry();const random=seeded(1042026),positions=new Float32Array(count*3),seeds=new Float32Array(count),sizes=new Float32Array(count),tones=new Float32Array(count),lands=new Float32Array(count),shells=new Float32Array(count);
  // Immutable seeded geometry: 78% thin shell, 22% volume. No regenerated particle arrays.
  for(let i=0;i<count;i++){const z=random()*2-1,theta=random()*Math.PI*2,phi=Math.sqrt(1-z*z);let radius=i<count*.78?1.91+random()*.09:Math.cbrt(random())*1.94;radius*=1+.036*Math.sin(theta*3+.6)+.022*Math.sin(theta*7+z*4);positions[i*3]=Math.cos(theta)*phi*radius;positions[i*3+1]=z*radius*.97;positions[i*3+2]=Math.sin(theta)*phi*radius;seeds[i]=random();sizes[i]=.85+random()*1.75;tones[i]=.3+random()*.7;}
+ for(let i=0;i<count;i++){lands[i]=onLand(positions[i*3],positions[i*3+1]/.97,positions[i*3+2]);shells[i]=i<count*.78?1:.06;}
+ geometry.setAttribute('aLand',new THREE.BufferAttribute(lands,1));geometry.setAttribute('aShell',new THREE.BufferAttribute(shells,1));
  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('aSeed',new THREE.BufferAttribute(seeds,1));geometry.setAttribute('aSize',new THREE.BufferAttribute(sizes,1));geometry.setAttribute('aTone',new THREE.BufferAttribute(tones,1));
  uniforms={uTime:{value:0},uAngle:{value:angle},uScale:{value:1},uOffsetX:{value:1},uWave:{value:.55},uZones:{value:0},uDpr:{value:1},uPointerActive:{value:0},uPointer:{value:new THREE.Vector2()},uTilt:{value:new THREE.Vector2()},uExposure:{value:1}};
  material=new THREE.ShaderMaterial({vertexShader,fragmentShader,uniforms,transparent:true,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending});
@@ -40,8 +54,8 @@ export function createNeuralField(canvas,reduced){
   // All objects/uniform vectors exist already. Only scalars change in the shared ticker.
   current.x+=(target.x-current.x)*damp;current.scale+=(target.scale-current.scale)*damp;current.rotation+=(target.rotation-current.rotation)*damp;current.wave+=(target.wave-current.wave)*damp;current.opacity+=(target.opacity-current.opacity)*damp;current.zones+=(target.zones-current.zones)*damp;
   pointer.x+=(pointerTarget.x-pointer.x)*damp;pointer.y+=(pointerTarget.y-pointer.y)*damp;pointer.active+=(pointerTarget.active-pointer.active)*damp;
-  if(!reduced.matches){time+=dt;angle+=dt*current.rotation;}
-  uniforms.uTime.value=time;uniforms.uAngle.value=angle;uniforms.uScale.value=1;uniforms.uOffsetX.value=0;uniforms.uWave.value=reduced.matches?0:current.wave;uniforms.uExposure.value=innerWidth<=600?.85:1.08;uniforms.uZones.value=current.zones;uniforms.uPointer.value.set(pointer.x,pointer.y);uniforms.uPointerActive.value=reduced.matches||coarse.matches?0:pointer.active;uniforms.uTilt.value.set(pointer.x*.025,pointer.y*.025);renderer.render(scene,camera);diagnostics.frames++;
+  if(!reduced.matches){time+=dt;angle+=dt*.018;}
+  uniforms.uTime.value=time;uniforms.uAngle.value=angle;uniforms.uScale.value=1;uniforms.uOffsetX.value=0;uniforms.uWave.value=reduced.matches?0:current.wave;uniforms.uExposure.value=innerWidth<=600?.85:1.08;uniforms.uZones.value=current.zones;uniforms.uPointer.value.set(pointer.x,pointer.y);uniforms.uPointerActive.value=reduced.matches||coarse.matches?0:pointer.active;uniforms.uTilt.value.set(pointer.x*.01,.20944+pointer.y*.01);renderer.render(scene,camera);diagnostics.frames++;
  }
  function setState(index){if(reduced.matches)return;Object.assign(target,STATES[index]);}
  function suspend(value){suspended=value;if(!value)render(0,true);}

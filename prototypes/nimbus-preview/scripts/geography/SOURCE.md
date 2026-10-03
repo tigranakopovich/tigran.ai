@@ -1,0 +1,11 @@
+# Earth geography
+
+Natural Earth physical land, 1:110m, version 4.1.0.
+Downloaded 2026-10-04 from https://naciscdn.org/naturalearth/110m/physical/ne_110m_land.zip
+Catalogue: https://www.naturalearthdata.com/downloads/110m-physical-vectors/
+Terms: https://www.naturalearthdata.com/about/terms-of-use/ (public domain).
+SHA256 original archive: 1926c621afd6ac67c3f36639bb1236134a48d82226dc675d3e3df53d02d2a3de
+
+Original archive preserved here. prepare-earth.py parses polygon shapefile using Python stdlib/Pillow already available (no installed dependencies).
+Outputs: public/earth/natural-earth-land-mask.png (1024x512 equirectangular), src/webgl/land-mask.json (same mask as row intervals, lazy-loaded in scene chunk), public/earth/earth-fallback.webp (orthographic25E/12N).
+Seeded positions/count remain unchanged. Land membership assigned once at scene creation; no runtime requests to geography services or per-frame mask computations.

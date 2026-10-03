@@ -2,6 +2,8 @@ export const vertexShader=/* glsl */`
 attribute float aSeed;
 attribute float aSize;
 attribute float aTone;
+attribute float aLand;
+attribute float aShell;
 uniform float uTime;
 uniform float uAngle;
 uniform float uScale;
@@ -15,10 +17,16 @@ uniform vec2 uTilt;
 varying float vLight;
 varying float vTone;
 varying float vDepth;
+varying float vLand;
+varying float vShell;
 void main(){
  vec3 p=position;
- float breath=1.0+sin(uTime*.31)*.018;
- p*=breath+uWave*sin(p.y*3.5+uTime*.33+aSeed*6.28)*.016;
+ p.y/=.97;
+ float longitude=atan(p.z,p.x);
+ float originalShape=1.0+.036*sin(longitude*3.0+.6)+.022*sin(longitude*7.0+normalize(p).y*4.0);
+ p/=originalShape;
+ float breath=1.0;
+ p*=breath;
  float angle=uAngle+uTilt.x;
  float c=cos(angle),s=sin(angle);
  p=vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);
@@ -27,7 +35,8 @@ void main(){
  float rim=pow(1.0-abs(normal.z),2.0);
  float directional=max(0.0,dot(normal,normalize(vec3(-.7,.9,1.0))));
  float bands=.5+.5*cos(length(position)*10.5);
- vLight=.055+rim*(1.18+directional*.62)+bands*uZones*.06;
+ vLight=.3+directional*.5+rim*.38;
+ vLand=aLand;vShell=aShell;
  vDepth=clamp((p.z+2.1)/4.2,.0,1.0);
  p*=uScale;p.x+=uOffsetX;p.y+=.02;
  vec4 mv=modelViewMatrix*vec4(p,1.0);
@@ -35,10 +44,10 @@ void main(){
  vec2 ndc=clip.xy/clip.w;
  vec2 diff=ndc-uPointer;
  float influence=exp(-dot(diff,diff)*95.0)*uPointerActive;
- p.xy+=normalize(diff+vec2(.001))*influence*.11;
+ p.xy+=normalize(diff+vec2(.001))*influence*.025;
  mv=modelViewMatrix*vec4(p,1.0);
  gl_Position=projectionMatrix*mv;
- gl_PointSize=clamp(aSize*uDpr*(.52+vDepth*.98)*(5.6/-mv.z),.65,4.3);
+ gl_PointSize=clamp(aSize*mix(1.0,1.25,step(1.5,aLand))*uDpr*(.52+vDepth*.98)*(5.6/-mv.z),.65,4.3);
  vTone=aTone;
 }
 `;
@@ -48,12 +57,17 @@ uniform float uExposure;
 varying float vLight;
 varying float vTone;
 varying float vDepth;
+varying float vLand;
+varying float vShell;
 void main(){
  float r=length(gl_PointCoord-.5);if(r>.5)discard;
  float core=1.0-smoothstep(.05,.5,r);
  vec3 silver=mix(vec3(.294,.333,.388),vec3(.957,.965,.973),vTone);
  if(vTone>.84)silver=mix(silver,vec3(.659,.737,.788),.24);
- float alpha=core*(.12+vDepth*.88)*vLight*uExposure*1.6;
+ float front=smoothstep(.48,.62,vDepth);
+ float geography=mix(.022,1.6,vLand);
+ float rim=pow(1.0-abs(vDepth*2.0-1.0),5.0)*.16;
+ float alpha=core*(geography+rim)*mix(.018,1.0,front)*vShell*vLight*uExposure;
  alpha=min(alpha,.88);
  gl_FragColor=vec4(silver,alpha);
 }

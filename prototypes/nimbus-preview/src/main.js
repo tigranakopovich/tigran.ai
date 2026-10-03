@@ -11,7 +11,7 @@ function loadField(){if(dead||reduced.matches||loading)return;loading=import('./
 // positions the CSS fallback and the WebGL field around the same two panels.
 function positionField(){
  const hero=document.querySelector('#hero'),stack=hero.querySelector('.hero-demo .scenario-stack'),stage=hero.querySelector('.neural-stage');
- const bounds=hero.getBoundingClientRect(),panels=stack.getBoundingClientRect(),size=panels.width*1.42;
+ const bounds=hero.getBoundingClientRect(),panels=stack.getBoundingClientRect(),size=Math.max(panels.height*1.35,panels.width*1.22)/.81;
  stage.style.width=`${size}px`;stage.style.height=`${size}px`;
  stage.style.left=`${panels.left-bounds.left+(panels.width-size)/2}px`;
  stage.style.top=`${panels.top-bounds.top+(panels.height-size)/2}px`;
