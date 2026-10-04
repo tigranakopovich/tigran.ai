@@ -11,12 +11,14 @@ function loadField(){if(dead||reduced.matches||loading)return;loading=import('./
 // positions the CSS fallback and the WebGL field around the same two panels.
 function positionField(){
  const hero=document.querySelector('#hero'),stack=hero.querySelector('.hero-demo .scenario-stack'),stage=hero.querySelector('.neural-stage');
- const bounds=hero.getBoundingClientRect(),panels=stack.getBoundingClientRect(),size=Math.max(panels.height*1.35,panels.width*1.22)/.81;
- stage.style.width=`${size}px`;stage.style.height=`${size}px`;
- stage.style.left=`${panels.left-bounds.left+(panels.width-size)/2}px`;
- stage.style.top=`${panels.top-bounds.top+(panels.height-size)/2}px`;
+ const bounds=hero.getBoundingClientRect(),panels=stack.getBoundingClientRect();
+ const centerX=(panels.left+panels.right)/2-bounds.left,centerY=(panels.top+panels.bottom)/2-bounds.top;
+ // Keep the existing responsive diameter; only align its centre to the cards.
+ stage.style.setProperty('--earth-left',`${centerX-stage.offsetWidth/2}px`);
+ stage.style.setProperty('--earth-top',`${centerY-stage.offsetHeight/2}px`);
 }
 positionField();
+const fieldLayout=new ResizeObserver(()=>{positionField();field.resize();});fieldLayout.observe(document.querySelector('.hero-demo .scenario-stack'));
 const cleanForm=setupForm(),motion=createChoreography(field,reduced);
 const carousels=Object.fromEntries([...document.querySelectorAll('[data-carousel]')].map(el=>[el.dataset.carousel,createCarousel(el,reduced)]));
 const supporting=createSupportingMotion(reduced),cleanGlow=setupWorkspaceGlow(document.querySelector('.tasks-workspace'),reduced);
@@ -27,6 +29,6 @@ document.fonts.ready.then(()=>{if(!dead){positionField();field.resize();}});
 const resize=()=>{positionField();field.resize();};window.addEventListener('resize',resize);
 const menu=document.querySelector('.mobile-menu');menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.open=false));const keydown=e=>{if(e.key==='Escape'&&menu.open){menu.open=false;menu.querySelector('summary').focus();}};document.addEventListener('keydown',keydown);
 function suspend(value){motion.suspend(value);Object.values(carousels).forEach(c=>c.suspend(value));supporting.suspend(value);}
-const pagehide=e=>{suspend(true);if(!e.persisted){clearTimeout(fieldTimer);reduced.removeEventListener('change',fieldMode);motion.destroy();Object.values(carousels).forEach(c=>c.destroy());supporting.destroy();cleanGlow();field.dispose();cleanForm();window.removeEventListener('resize',resize);window.removeEventListener('scroll',updateScroll);document.removeEventListener('keydown',keydown);}};
+const pagehide=e=>{suspend(true);if(!e.persisted){clearTimeout(fieldTimer);fieldLayout.disconnect();reduced.removeEventListener('change',fieldMode);motion.destroy();Object.values(carousels).forEach(c=>c.destroy());supporting.destroy();cleanGlow();field.dispose();cleanForm();window.removeEventListener('resize',resize);window.removeEventListener('scroll',updateScroll);document.removeEventListener('keydown',keydown);}};
 const pageshow=e=>{if(e.persisted){suspend(false);positionField();field.resize();supporting.draw();updateScroll();}};window.addEventListener('pagehide',pagehide);window.addEventListener('pageshow',pageshow);
 window.nimbusPreview={get field(){return field.diagnostics;},motion,carousels,supporting,reduced};

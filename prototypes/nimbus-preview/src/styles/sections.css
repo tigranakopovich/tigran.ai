@@ -126,7 +126,9 @@ main{overflow-x:clip}
 .section::before,.final-section::before{content:'';position:absolute;inset:0 -50px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 65% 48%,rgba(77,103,127,.13),transparent 68%)}
 .hero::before{content:'';position:absolute;inset:70px -56px 20px 48%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse,rgba(72,102,131,.17),transparent 67%)}
 .sample-card{background:var(--reflection),var(--glass);border-color:rgba(225,235,245,.23);border-top-color:rgba(225,235,245,.36)}
-.neural-stage::before{content:'';position:absolute;inset:9.5%;border-radius:50%;background:radial-gradient(circle at 32% 24%,rgba(86,117,146,.15),rgba(30,48,66,.06) 58%,transparent 71%);box-shadow:inset 0 0 24px rgba(133,176,206,.09);pointer-events:none}
+.neural-stage{isolation:isolate}
+.neural-stage::before{content:'';position:absolute;inset:9.1%;border-radius:50%;background:radial-gradient(circle at 30% 19%,rgba(92,130,166,.15),rgba(27,42,60,.06) 49%,rgba(8,16,27,.19) 78%);border:1px solid rgba(163,204,236,.20);box-shadow:inset 1px 3px 5px rgba(180,214,242,.19),inset -1px -3px 7px rgba(9,18,32,.4),0 0 6px rgba(140,185,222,.10);pointer-events:none}
+.neural-stage::after{content:'';position:absolute;inset:-1%;z-index:-1;pointer-events:none;background:radial-gradient(circle closest-side,transparent 77%,rgba(127,169,204,.06) 80%,rgba(101,146,187,.045) 86%,transparent 98%)}
 .neural-fallback{inset:9.5%;background:url('/earth/earth-fallback.webp') center/contain no-repeat;opacity:.8;transform:none}
 .neural-stage canvas{opacity:.9}
 .hero-scenario .variants{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
@@ -159,9 +161,59 @@ main{overflow-x:clip}
 }
 
 .task-visual .demo-route{align-self:center}
+.hero-scenario .demo-route{transform:none}
+.hero-transfer-arrow{display:block;width:16px;height:28px;line-height:0}
+.hero-transfer-arrow svg{display:block;width:100%;height:100%}
 @media(min-width:901px){
  .contact-copy h2{font-size:42px;max-width:900px;text-wrap:initial}.contact-copy h2>span{display:block}
  .final-panel{padding:26px}.stage-heading>.icon{padding:8px}.stages{margin-top:18px}
 }
 
 .hero-scenario th,.hero-scenario td{padding:6px 8px}
+
+/* Local owner review: silver point Earth, existing bounded placement. */
+.hero::before{inset:0 -56px;background:radial-gradient(ellipse 680px 440px at 75% 42%,rgba(75,135,189,.13),rgba(47,93,135,.045) 42%,transparent 75%)}
+.neural-stage{--earth-size:min(56vw,806px);width:var(--earth-size)!important;height:var(--earth-size)!important;left:calc(100% - min(50.96vw,733.46px))!important;top:12px!important}
+.neural-stage::before{background:radial-gradient(circle at 32% 22%,rgba(107,130,153,.11),rgba(26,36,49,.025) 58%,rgba(9,15,23,.08) 78%);border-color:rgba(165,215,249,.30);box-shadow:inset 1px 3px 5px rgba(178,219,249,.26),inset -1px -3px 7px rgba(9,18,32,.4),0 0 7px rgba(121,180,232,.14)}
+.neural-stage::after{inset:-3%;background:radial-gradient(circle closest-side,transparent 75%,rgba(105,167,224,.075) 79%,rgba(79,132,185,.045) 86%,transparent 98%)}
+.neural-fallback{inset:0;opacity:.9}
+@media(max-width:900px){.neural-stage{--earth-size:min(112vw,760px);left:calc(50% - min(56vw,380px))!important;top:48%!important}.hero::before{inset:35% -16px 20px -16px;background:radial-gradient(ellipse at 65% 50%,rgba(75,135,189,.15),transparent 72%)}}
+@media(max-width:600px){.neural-stage canvas,.neural-fallback{opacity:.72}}
+
+/* Hero-only final pass: directional atmosphere and compact shared result row. */
+.neural-stage::before{border-top-color:rgba(203,226,248,.70);border-left-color:rgba(163,204,238,.40);border-right-color:rgba(151,194,231,.25);border-bottom-color:rgba(123,166,204,.08);box-shadow:inset 0 2px 3px rgba(194,224,249,.40),inset 0 -2px 5px rgba(9,18,32,.35),0 -3px 10px rgba(133,188,233,.18)}
+.neural-stage::after{inset:-5%;background:radial-gradient(circle closest-side,transparent 73%,rgba(135,182,224,.11) 78%,rgba(103,149,191,.055) 87%,transparent 99%);mask-image:linear-gradient(160deg,#000 20%,rgba(0,0,0,.5) 58%,rgba(0,0,0,.1) 90%)}
+.hero-scenario .result-card{padding-block:12px}
+.hero-scenario .result-card .data-label{margin-bottom:6px}
+.hero-scenario .result-card h3+.data-body{margin-top:8px}
+.hero-scenario .result-card .result-footer{margin-top:8px}
+.hero-scenario .result-card .message-data{gap:4px}
+.hero-scenario .result-card .paper-data{gap:3px;padding-block:8px}
+.hero-scenario .result-card th,.hero-scenario .result-card td{padding-block:4px}
+.hero-scenario .result-card .variants{gap:4px}
+.hero-scenario .result-card .variants li{padding-block:0}
+@media(min-width:901px){
+ .hero-scenario .result-card .message-data:has(.variants){grid-template-columns:minmax(0,1fr) 152px;column-gap:14px}
+ .hero-scenario .result-card .message-data:has(.variants)>strong,.hero-scenario .result-card .message-data:has(.variants)>p{grid-column:1}
+ .hero-scenario .result-card .message-data:has(.variants)>.variants{grid-column:2;grid-row:1/3;display:grid;grid-template-columns:1fr;margin:0;align-self:start}
+ .hero-scenario .result-card .variants li{display:block}
+ .hero-scenario .result-card .variants li>strong{margin-right:8px}
+}
+@media(max-width:900px){
+ .hero-scenario .result-card .variants{grid-template-columns:1fr}
+ .hero-scenario .result-card .variants li{display:block}
+ .hero-scenario .result-card .variants li>strong{margin-right:8px}
+ .hero-scenario .result-card .variants li>span{padding:0;border:0}
+}
+
+/* Centre the unchanged Earth diameter on the cards, excluding headings/controls. */
+.neural-stage{left:var(--earth-left,0px)!important;top:var(--earth-top,0px)!important}
+.hero-demo-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.hero-demo-heading>.eyebrow{margin:0;font-size:14px}
+.hero-pause{display:grid;place-items:center;flex:none;width:44px;height:44px;min-height:44px;padding:10px;border-radius:12px}
+.hero-pause svg{width:20px;height:20px}
+.hero-pause .play-icon{display:none}
+.hero-pause[data-stopped="true"] .pause-icon{display:none}
+.hero-pause[data-stopped="true"] .play-icon{display:block}
+.hero-pause:focus-visible{outline:2px solid var(--mint,#92DABB);outline-offset:3px}
+@media(max-width:600px){.hero-demo-heading>.eyebrow{font-size:12px}}

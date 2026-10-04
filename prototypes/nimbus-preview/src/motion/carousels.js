@@ -20,20 +20,24 @@ export function createCarousel(host,reduced){
  const canRun=()=>state.visible&&!state.hidden&&!state.reduced&&!suspended&&!disposed;
  const canAdvance=()=>canRun()&&!state.userPaused&&!state.interactionHeld;
  function stopDeadline(){deadline?.kill();deadline=null;}
- function full(){state.phase='result';state.progress=1;finished=true;panels.forEach(p=>{gsap.set(p,{clearProps:'opacity'});gsap.set(p.querySelectorAll('.value-fragment,.result-footer'),{clearProps:'opacity'});gsap.set(p.querySelector('.route-signal'),{clearProps:'transform,opacity'});});if(bar)gsap.set(bar,{scaleX:1});}
+ function full(){state.phase='result';state.progress=1;finished=true;panels.forEach(p=>{gsap.set(p,{clearProps:'opacity'});gsap.set(p.querySelectorAll('.value-fragment,.result-footer'),{clearProps:'opacity'});gsap.set(p.querySelector(kind==='hero'?'.hero-transfer-arrow':'.route-signal'),{clearProps:'transform,opacity'});});if(bar)gsap.set(bar,{scaleX:1});}
  function cancel(){state.runId++;sequence?.kill();sequence=null;stopDeadline();full();}
- function controls(){const stopped=finished&&state.userPaused;pauseButton.setAttribute('aria-label',stopped?copy.controls.resume:copy.controls.pause);pauseButton.setAttribute('aria-pressed',String(stopped));pauseButton.textContent=stopped?'Продолжить':'Остановить';}
+ function controls(){const stopped=finished&&state.userPaused;pauseButton.setAttribute('aria-label',stopped?copy.controls.resume:copy.controls.pause);pauseButton.setAttribute('aria-pressed',String(stopped));if(kind==='hero')pauseButton.dataset.stopped=String(stopped);else pauseButton.textContent=stopped?'Продолжить':'Остановить';}
  function advance(){if(!canAdvance()||!finished)return;if(state.selected===items.length-1)state.completedCycles++;select((state.selected+1)%items.length,false);}
  function resumeAdvance(){stopDeadline();if(canAdvance()&&finished)deadline=gsap.delayedCall(kind==='hero'?1.5:5,advance);}
  function fill(timeline,nodes,start,duration){if(!nodes.length)return;const actual=kind==='hero'?duration:Math.min(duration,Math.max(.35,nodes.length*.38));timeline.to(nodes,{opacity:1,duration:.14,stagger:{amount:Math.max(0,actual-.14)},ease:'none'},start);}
  function demonstrate(){
   if(!canRun()){full();return;}
-  const panel=panels[state.selected],content=values[state.selected],signal=panel.querySelector('.route-signal'),footer=panel.querySelector('.result-footer'),run=state.runId;
+  const panel=panels[state.selected],content=values[state.selected],signal=panel.querySelector(kind==='hero'?'.hero-transfer-arrow':'.route-signal'),footer=panel.querySelector('.result-footer'),run=state.runId;
   const sourceDuration=timing.sourceMs/1000,transfer=timing.processMs/1000,resultDuration=timing.resultMs/1000,resultStart=sourceDuration+transfer;
   finished=false;state.phase='source';state.progress=0;gsap.set([...content.source,...content.result,footer],{opacity:0});if(bar)gsap.set(bar,{scaleX:0});
+  if(kind==='hero')gsap.set(signal,{y:-8,opacity:0});
   sequence=gsap.timeline({onComplete:()=>{if(run!==state.runId)return;sequence=null;full();controls();advance();}});
   sequence.fromTo(panel,{opacity:.6},{opacity:1,duration:.25,ease:'power2.out'},0);fill(sequence,content.source,0,sourceDuration);
-  sequence.call(()=>{state.phase='process';},[],sourceDuration).fromTo(signal,{x:-9,opacity:0},{x:9,opacity:1,duration:transfer*.65,ease:'power2.inOut'},sourceDuration).to(signal,{opacity:0,duration:transfer*.35},sourceDuration+transfer*.65).call(()=>{state.phase='filling';},[],resultStart);
+  sequence.call(()=>{state.phase='process';},[],sourceDuration);
+  if(kind==='hero')sequence.to(signal,{opacity:1,duration:transfer*.25,ease:'power1.out'},sourceDuration).to(signal,{y:0,duration:transfer,ease:'power2.inOut'},sourceDuration);
+  else sequence.fromTo(signal,{x:-9,opacity:0},{x:9,opacity:1,duration:transfer*.65,ease:'power2.inOut'},sourceDuration).to(signal,{opacity:0,duration:transfer*.35},sourceDuration+transfer*.65);
+  sequence.call(()=>{state.phase='filling';},[],resultStart);
   fill(sequence,content.result,resultStart,resultDuration);
   const resultEnd=resultStart+(kind==='hero'?resultDuration:Math.min(resultDuration,Math.max(.35,content.result.length*.38)));
   sequence.to(footer,{opacity:1,duration:.2},resultEnd).call(()=>{state.phase='reading';},[],resultEnd+.2);
