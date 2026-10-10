@@ -27,6 +27,7 @@ export const fragmentShader=/* glsl */`
 uniform float uExposure;
 uniform vec4 uSourceRect;
 uniform vec4 uResultRect;
+uniform vec4 uTabsRect;
 varying float vLand;
 varying float vTone;
 varying float vLight;
@@ -41,7 +42,7 @@ void main(){
  float core=1.0-smoothstep(.20,.5,r);
  float geography=vLand<.5?.012:(vLand>1.5?1.60:1.18);
  float front=mix(.004,1.0,smoothstep(.015,.20,vFront));
- float veil=1.0-.65*max(panel(uSourceRect),panel(uResultRect));
+ float veil=1.0-max(.90*max(panel(uSourceRect),panel(uResultRect)),.86*panel(uTabsRect));
  vec3 silver=mix(vec3(.70,.76,.82),vec3(.94,.96,.98),vTone);
  float alpha=min(.92,core*geography*front*vLight*uExposure*veil);
  gl_FragColor=vec4(silver,alpha);

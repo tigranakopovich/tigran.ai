@@ -10,7 +10,7 @@ export function createChoreography(field,reduced){
  const tick=(seconds,deltaMs)=>{if(suspended||document.hidden||destroyed)return;lenis?.raf(seconds*1000);elapsed+=deltaMs/1000;if(innerWidth>600||elapsed>=1/30){if(heroVisible)field.render(Math.min(elapsed,.05));elapsed=0;}};
  const stop=()=>{gsap.ticker.remove(tick);lenis?.destroy();lenis=null;context?.revert();context=null;};
  function start(){if(reduced.matches||destroyed)return;
-  lenis=new Lenis({autoRaf:false,smoothWheel:matchMedia('(pointer:fine)').matches,wheelMultiplier:matchMedia('(pointer:fine)').matches?.8:1,lerp:matchMedia('(pointer:fine)').matches?.075:.085,anchors:{offset:-105}});lenis.on('scroll',ScrollTrigger.update);
+  lenis=new Lenis({autoRaf:false,smoothWheel:matchMedia('(pointer:fine)').matches,wheelMultiplier:matchMedia('(pointer:fine)').matches?.8:1,lerp:matchMedia('(pointer:fine)').matches?.075:.085,anchors:false});lenis.on('scroll',ScrollTrigger.update);
   context=gsap.context(()=>{
    const mm=gsap.matchMedia();mm.add('(min-width:901px)',()=>{const lines=hero.querySelectorAll('h1>span'),amount=innerWidth<1200?14:24;const tl=gsap.timeline({scrollTrigger:{trigger:hero,start:'top top',end:'bottom top',scrub:true}});tl.to(lines[0],{x:-amount,ease:'none'},0).to(lines[1],{x:amount,ease:'none'},0).to(lines[2],{y:12,ease:'none'},0);});
    document.querySelectorAll('.section-heading,.tasks-workspace,.case-copy,.case-showcase').forEach(block=>{
@@ -27,6 +27,6 @@ export function createChoreography(field,reduced){
  const mode=()=>{stop();if(reduced.matches)field.render(0,true);else start();};reduced.addEventListener('change',mode);start();
  const hidden=()=>suspend(document.hidden);document.addEventListener('visibilitychange',hidden);
  function suspend(value){suspended=value;field.suspend(value);}
- return {suspend,get lenisEnabled(){return!!lenis;},destroy(){destroyed=true;observer.disconnect();stop();reduced.removeEventListener('change',mode);document.removeEventListener('visibilitychange',hidden);}};
+ return {suspend,get lenis(){return lenis;},get lenisEnabled(){return!!lenis;},destroy(){destroyed=true;observer.disconnect();stop();reduced.removeEventListener('change',mode);document.removeEventListener('visibilitychange',hidden);}};
 }
 

@@ -1,4 +1,4 @@
-# Tigran AI — Nimbus prototype
+# Tigran AI — прототип
 
 Статус: локальный прототип для просмотра, без публикации. Дата: 02.10.2026.
 
@@ -104,6 +104,11 @@ Unbounded 900 / IBM Plex Mono нужны для точной версии шри
 
 ## Публикация основной страницы — 2 октября 2026
 
-По прямому разрешению владельца Nimbus подготовлен для основного адреса Vercel. Исходники остаются в этом каталоге; production HTML, assets и images лежат в корне репозитория. Для обновления: `npm run build --prefix prototypes/nimbus-preview`, затем `node prototypes/nimbus-preview/publish-root.cjs`, commit и push в main. Vercel автоматически публикует корневой статичный сайт. Публикуемый HTML имеет production title и разрешённую индексацию; локальный прототип сохраняет noindex.
+По прямому разрешению владельца Tigran AI подготовлен для основного адреса Vercel. Исходники остаются в этом каталоге; production HTML, assets и images лежат в корне репозитория. Для обновления: `npm run build --prefix prototypes/nimbus-preview`, затем `node prototypes/nimbus-preview/publish-root.cjs`, commit и push в main. Vercel автоматически публикует корневой статичный сайт. Публикуемый HTML имеет production title и разрешённую индексацию; локальный прототип сохраняет noindex.
 
 Разовая проверка production-файлов Chrome: 1440 и 390 px, пять секций, отсутствие горизонтального скролла, загрузка Manrope, Telegram draft URL и отсутствие ошибок консоли. Ограничения устройств и Telegram composer из предыдущего отчёта сохраняются.
+
+
+## Актуальная публикация — 11 октября 2026
+
+Vercel обслуживает только `site/` по `vercel.json`. Историческая инструкция выше про корневой export больше не применяется. Для текущей версии: `npm run build --prefix prototypes/nimbus-preview`, затем `node scripts/export-site.cjs`, проверка `site/`, commit и push в main. `publish-root.cjs` для текущего deployment не использовать. Экспорт включает только runtime assets, шрифты/лицензию, обработанный портрет и Earth fallback; исходники, материалы, `.env` и отчёты не публикуются. Production title отличается от локального прототипа.

@@ -35,7 +35,7 @@ export function createNeuralField(canvas,reduced){
  renderer=new THREE.WebGLRenderer({canvas,context,alpha:true,antialias:false,powerPreference:'low-power'});renderer.setClearColor(0x080e0b,0);
  camera=new THREE.OrthographicCamera(-2.39*width/height,2.39*width/height,2.39,-2.39,.1,20);camera.position.z=6.4;
  scene=new THREE.Scene();geometry=pointGeometry(count);
- uniforms={uTime:{value:0},uAngle:{value:angle},uScale:{value:1},uOffsetX:{value:1},uWave:{value:.55},uZones:{value:0},uDpr:{value:1},uPointerActive:{value:0},uPointer:{value:new THREE.Vector2()},uTilt:{value:new THREE.Vector2()},uExposure:{value:1},uSourceRect:{value:new THREE.Vector4()},uResultRect:{value:new THREE.Vector4()}};
+ uniforms={uTime:{value:0},uAngle:{value:angle},uScale:{value:1},uOffsetX:{value:1},uWave:{value:.55},uZones:{value:0},uDpr:{value:1},uPointerActive:{value:0},uPointer:{value:new THREE.Vector2()},uTilt:{value:new THREE.Vector2()},uExposure:{value:1},uSourceRect:{value:new THREE.Vector4()},uResultRect:{value:new THREE.Vector4()},uTabsRect:{value:new THREE.Vector4()}};
  material=new THREE.ShaderMaterial({vertexShader,fragmentShader,uniforms,transparent:true,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending});
  const earth=new THREE.Points(geometry,material);earth.frustumCulled=false;scene.add(earth);diagnostics.available=true;document.body.classList.add('webgl-ready');
  }catch{geometry?.dispose();material?.dispose();renderer?.dispose();return{diagnostics,setState(){},render(){},resize(){},suspend(){},dispose(){}};}
@@ -46,7 +46,7 @@ export function createNeuralField(canvas,reduced){
  const leave=()=>{pointerTarget.active=0;};window.addEventListener('pointermove',move,{passive:true});document.addEventListener('pointerleave',leave);
  function resize(){if(disposed)return;width=canvas.clientWidth;height=canvas.clientHeight;renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<=600?1:1.5));renderer.setSize(width,height,false);diagnostics.dpr=renderer.getPixelRatio();uniforms.uDpr.value=diagnostics.dpr;camera.left=-2.39*width/height;camera.right=2.39*width/height;camera.updateProjectionMatrix();
   const stage=canvas.getBoundingClientRect();
-  for(const [selector,key] of [['.source-card','uSourceRect'],['.result-card','uResultRect']]){const rect=document.querySelector(`.hero-scenario:not([hidden]) ${selector}`).getBoundingClientRect();uniforms[key].value.set((rect.left-stage.left)/width*2-1,1-(rect.bottom-stage.top)/height*2,(rect.right-stage.left)/width*2-1,1-(rect.top-stage.top)/height*2);}
+  for(const [selector,key] of [['.hero-scenario:not([hidden]) .source-card','uSourceRect'],['.hero-scenario:not([hidden]) .result-card','uResultRect'],['.hero-selectors','uTabsRect']]){const rect=document.querySelector(selector).getBoundingClientRect();uniforms[key].value.set((rect.left-stage.left)/width*2-1,1-(rect.bottom-stage.top)/height*2,(rect.right-stage.left)/width*2-1,1-(rect.top-stage.top)/height*2);}
   render(0,true);}
  function render(delta,force=false){
   if(disposed||suspended||(!force&&(document.hidden||reduced.matches)))return;
